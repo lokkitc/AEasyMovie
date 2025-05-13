@@ -1,0 +1,89 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-black text-gray-900 dark:text-dark-text text-sm;
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
+  p, span, div, button, input, textarea, select {
+    @apply text-sm;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors text-sm;
+}
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600;
+}
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-dark-secondary dark:text-dark-text dark:hover:bg-dark-accent;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-dark-secondary dark:border-dark-accent dark:text-dark-text text-sm;
+  }
+
+  /* Навигация */
+  nav {
+    @apply bg-white dark:bg-black shadow-lg;
+  }
+
+  nav a {
+    @apply text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm;
+  }
+
+  /* Карточки фильмов */
+  .movie-card {
+    @apply bg-white dark:bg-dark-secondary rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow;
+  }
+
+  .movie-card h2 {
+    @apply text-lg font-semibold mb-2 text-gray-900 dark:text-white;
+  }
+
+  .movie-card p {
+    @apply text-gray-600 dark:text-gray-300 mb-2 line-clamp-2 text-sm;
+  }
+
+  .movie-card .movie-info {
+    @apply flex justify-between text-xs text-gray-500 dark:text-gray-400;
+  }
+
+  /* Футер */
+  footer {
+    @apply bg-white dark:bg-black shadow-lg mt-8;
+  }
+
+  footer p {
+    @apply text-gray-600 dark:text-gray-300 text-sm;
+  }
+}
+
+:root {
+  font-family: 'Exo 2', sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #0f172a;
+}
