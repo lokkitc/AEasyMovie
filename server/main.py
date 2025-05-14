@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Добавляем корневую директорию в PYTHONPATH
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
@@ -9,7 +15,6 @@ from config.logging_config import setup_logging
 from api.services.premium_service import start_premium_checker
 from db.session import async_session
 import asyncio
-import os
 from tasks.background_tasks import start_background_tasks
 from core.oauth import setup_oauth
 from contextlib import asynccontextmanager
