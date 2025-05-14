@@ -8,7 +8,6 @@ from db.models.users import User
 from sqlalchemy.ext.asyncio import AsyncSession
 
 async def create_new_movie(body: MovieCreate, session, current_user: User) -> MovieRead:
-    async with session.begin():
         movie_dal = MovieDAL(session)
         new_movie = await movie_dal.create_movie(
             title=body.title,
@@ -41,7 +40,6 @@ async def create_new_movie(body: MovieCreate, session, current_user: User) -> Mo
         )
 
 async def delete_movie(movie_id: int, session) -> Union[int, None]:
-    async with session.begin():
         movie_dal = MovieDAL(session)
         deleted_movie_id = await movie_dal.delete_movie(movie_id=movie_id)
         return deleted_movie_id
@@ -90,40 +88,38 @@ async def get_movie(movie_id: int, session) -> Union[MovieRead, None]:
         )
 
 async def get_movies(session) -> List[MovieRead]:
-    async with session.begin():
-        movie_dal = MovieDAL(session)
-        movies = await movie_dal.get_movies()
-        return [MovieRead(
-            movie_id=movie.movie_id,
-            title=movie.title,
-            original_title=movie.original_title,
-            description=movie.description,
-            poster=movie.poster,
-            backdrop=movie.backdrop,
-            release_date=movie.release_date,
-            duration=movie.duration,
-            rating=movie.rating,
-            director=movie.director,
-            genres=movie.genres.split(",") if movie.genres else [],
-            created_at=movie.created_at,
-            updated_at=movie.updated_at,
+    movie_dal = MovieDAL(session)
+    movies = await movie_dal.get_movies()
+    return [MovieRead(
+        movie_id=movie.movie_id,
+        title=movie.title,
+        original_title=movie.original_title,
+        description=movie.description,
+        poster=movie.poster,
+        backdrop=movie.backdrop,
+        release_date=movie.release_date,
+        duration=movie.duration,
+        rating=movie.rating,
+        director=movie.director,
+        genres=movie.genres.split(",") if movie.genres else [],
+        created_at=movie.created_at,
+        updated_at=movie.updated_at,
             is_active=movie.is_active,
             movie_url=movie.movie_url,
         ) for movie in movies]
 
 async def update_movie(updated_movie_params: dict, movie_id: int, session) -> Union[int, None]:
-    async with session.begin():
-        movie_dal = MovieDAL(session)
-        if "genres" in updated_movie_params:
-            updated_movie_params["genres"] = ",".join(updated_movie_params["genres"])
-        if "release_date" in updated_movie_params and updated_movie_params["release_date"].tzinfo is not None:
-            updated_movie_params["release_date"] = updated_movie_params["release_date"].replace(tzinfo=None)
-        result = await movie_dal.update_movie(
-            movie_id=movie_id,
-            **updated_movie_params,
-            updated_at=datetime.now()
-        )
-        return movie_id
+    movie_dal = MovieDAL(session)
+    if "genres" in updated_movie_params:
+        updated_movie_params["genres"] = ",".join(updated_movie_params["genres"])
+    if "release_date" in updated_movie_params and updated_movie_params["release_date"].tzinfo is not None:
+        updated_movie_params["release_date"] = updated_movie_params["release_date"].replace(tzinfo=None)
+    result = await movie_dal.update_movie(
+        movie_id=movie_id,
+        **updated_movie_params,
+        updated_at=datetime.now()
+    )
+    return movie_id
 
 async def check_movie_access(movie_id: int, user: User, session: AsyncSession) -> bool:
     """
@@ -149,52 +145,49 @@ async def check_movie_modify(movie_id: int, user: User, session: AsyncSession) -
     """
     Проверяет право пользователя на модификацию фильма
     """
-    async with session.begin():
-        movie_dal = MovieDAL(session)
-        movie = await movie_dal.get_movie(movie_id=movie_id)
+    movie_dal = MovieDAL(session)
+    movie = await movie_dal.get_movie(movie_id=movie_id)
         
-        if not movie:
-            raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
+    if not movie:
+        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
             
-        return movie.can_modify(user)
+    return movie.can_modify(user)
 
 async def check_movie_delete(movie_id: int, user: User, session: AsyncSession) -> bool:
     """
     Проверяет право пользователя на удаление фильма
     """
-    async with session.begin():
-        movie_dal = MovieDAL(session)
-        movie = await movie_dal.get_movie(movie_id=movie_id)
+    movie_dal = MovieDAL(session)
+    movie = await movie_dal.get_movie(movie_id=movie_id)
         
-        if not movie:
-            raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
+    if not movie:
+        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
             
-        return movie.can_delete(user)
+    return movie.can_delete(user)
 
 async def update_movie_access_level(movie_id: int, access_level: MovieAccessLevel, user: User, session: AsyncSession) -> Movie:
     """
     Обновляет уровень доступа к фильму
     """
-    async with session.begin():
-        movie_dal = MovieDAL(session)
-        movie = await movie_dal.get_movie(movie_id=movie_id)
+    movie_dal = MovieDAL(session)
+    movie = await movie_dal.get_movie(movie_id=movie_id)
         
-        if not movie:
-            raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
+    if not movie:
+        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
             
-        if not movie.can_modify(user):
-            raise HTTPException(status_code=403, detail="You don't have permission to modify this movie")
+    if not movie.can_modify(user):
+        raise HTTPException(status_code=403, detail="You don't have permission to modify this movie")
             
         # Обновляем уровень доступа
-        await movie_dal.update_movie(
-            movie_id=movie_id,
-            access_level=access_level,
-            updated_at=datetime.now()
-        )
+    await movie_dal.update_movie(
+        movie_id=movie_id,
+        access_level=access_level,
+        updated_at=datetime.now()
+    )
         
         # Получаем обновленный фильм
-        updated_movie = await movie_dal.get_movie(movie_id=movie_id)
-        return updated_movie 
+    updated_movie = await movie_dal.get_movie(movie_id=movie_id)
+    return updated_movie 
 
 async def update_all_movies_ratings(session: AsyncSession) -> None:
     """Обновляет рейтинги всех активных фильмов"""

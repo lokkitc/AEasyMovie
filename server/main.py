@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from api.router import main_router
-from api.routers import auth
+from api.routers import auth, users, movies, comments, episodes, premium
 from api.middleware.timing import TimingMiddleware
 from config.logging_config import setup_logging
 from api.services.premium_service import start_premium_checker
@@ -12,15 +12,24 @@ import asyncio
 import os
 from tasks.background_tasks import start_background_tasks
 from core.oauth import setup_oauth
+from contextlib import asynccontextmanager
 
 setup_logging()
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Запускает фоновые задачи при старте приложения и очищает ресурсы при остановке"""
+    session = async_session()
+    asyncio.create_task(start_premium_checker(session))
+    await start_background_tasks()
+    yield
+
 app = FastAPI(
     title="API для работы с базой данных",
-    description="API для работы с базой данных"
+    description="API для работы с базой данных",
+    lifespan=lifespan
 )
 
-# Настройка CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -33,25 +42,13 @@ app.add_middleware(
 
 app.add_middleware(TimingMiddleware)
 
-# Настройка OAuth
 setup_oauth(app)
 
-# Создаем директорию для медиафайлов, если она не существует
 os.makedirs("server/media", exist_ok=True)
 
-# Монтируем статические файлы
 app.mount("/media", StaticFiles(directory="server/media", html=True), name="media")
 
-# Регистрация роутеров
-app.include_router(main_router, prefix="/api")
-app.include_router(auth.auth_router, prefix="/api/auth", tags=["auth"])
-
-@app.on_event("startup")
-async def startup_event():
-    """Запускает фоновые задачи при старте приложения"""
-    session = async_session()
-    asyncio.create_task(start_premium_checker(session))
-    await start_background_tasks()
+app.include_router(main_router)
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -1,10 +1,19 @@
 export interface User {
-  id: number;
+  user_id: number;
   username: string;
+  name: string;
+  surname: string;
   email: string;
-  photo?: string;
-  createdAt: string;
-  updatedAt: string;
+  photo: string;
+  header_photo: string;
+  about: string;
+  location: string;
+  age: number;
+  created_at: string;
+  updated_at: string;
+  is_premium: boolean;
+  level: number;
+  title: string;
 }
 
 export interface UserResponse {

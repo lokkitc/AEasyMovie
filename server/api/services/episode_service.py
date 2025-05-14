@@ -40,15 +40,18 @@ async def check_episode_access(user: User, episode_id: int, session: AsyncSessio
     if user.is_premium_active():
         return True
         
+    try:
         purchased = await session.execute(
             select(PurchasedEpisode).where(
                 and_(
-                PurchasedEpisode.user_id == user.user_id,
+                    PurchasedEpisode.user_id == user.user_id,
                     PurchasedEpisode.episode_id == episode_id
                 )
             )
         )
-    return purchased.scalar_one_or_none() is not None
+        return purchased.scalar_one_or_none() is not None
+    except Exception:
+        return False
 
 async def create_new_episode(body: EpisodeCreate, session: AsyncSession, current_user: User) -> EpisodeList:
     episode_dal = EpisodeDAL(session)

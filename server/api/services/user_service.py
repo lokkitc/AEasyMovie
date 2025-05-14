@@ -135,7 +135,7 @@ async def get_user_by_username(username, session) -> Union[UserRead, None]:
 
 async def get_users(session) -> list[UserRead]:
     user_dal = UserDAL(session)
-    users = await user_dal.get_users(is_active=True)
+    users = await user_dal.get_users()
     return [UserRead(
         user_id=user.user_id,
         name=user.name,

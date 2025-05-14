@@ -249,7 +249,7 @@ export default function MovieDetails() {
       if (videoId) {
         try {
           playerRef.current = new window.YT.Player('youtube-player', {
-            height: '400',
+            height: '500',
             width: '100%',
             videoId: videoId,
             playerVars: {

@@ -1,11 +1,19 @@
 import { useState } from 'react';
 import { useUsers } from '../hooks/useUsers';
+import { useNavigate } from 'react-router-dom';
 
 export const UsersList = () => {
   const [page, setPage] = useState(1);
   const { users = [], loading, error, total } = useUsers(page);
   const limit = 10;
   const totalPages = Math.ceil(total / limit);
+  const navigate = useNavigate();
+
+  const handleUserClick = (userId: number) => {
+    if (userId) {
+      navigate(`/users/${userId}`);
+    }
+  };
 
   if (loading) {
     return (
@@ -54,26 +62,27 @@ export const UsersList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {users.map((user, index) => (
           <div
-            key={user.id ? `user-${user.id}` : `user-${index}`}
-            className="bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow"
+            key={user.user_id ? `user-${user.user_id}` : `user-${index}`}
+            className="bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+            onClick={() => handleUserClick(user.user_id)}
           >
             <div className="flex items-center space-x-4">
               {user.photo ? (
                 <img
-                  key={user.id ? `photo-${user.id}` : `photo-${index}`}
+                  key={user.user_id ? `photo-${user.user_id}` : `photo-${index}`}
                   src={user.photo}
                   alt={user.username}
                   className="w-12 h-12 rounded-full"
                 />
               ) : (
                 <div 
-                  key={user.id ? `avatar-placeholder-${user.id}` : `avatar-placeholder-${index}`}
+                  key={user.user_id ? `avatar-placeholder-${user.user_id}` : `avatar-placeholder-${index}`}
                   className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl"
                 >
                   {user.username[0].toUpperCase()}
                 </div>
               )}
-              <div key={user.id ? `user-info-${user.id}` : `user-info-${index}`}>
+              <div key={user.user_id ? `user-info-${user.user_id}` : `user-info-${index}`}>
                 <h3 className="text-lg font-semibold text-white">{user.username}</h3>
                 <p className="text-gray-400">{user.email}</p>
               </div>

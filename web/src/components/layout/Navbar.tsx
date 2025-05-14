@@ -45,7 +45,7 @@ export default function Navbar() {
   return (
     <nav className="bg-white dark:bg-dark-secondary shadow-lg">
       <div className="container mx-auto px-4" style={{ maxWidth: maxWidth }}>
-        <div className="flex justify-between items-center h-12">
+        <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <img src="/logo-transparent.png" alt="AEasyMovie" className="w-10 h-10" />
             AEasyMovie

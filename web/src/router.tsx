@@ -9,6 +9,7 @@ import Profile from './pages/Profile'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import Users from './pages/Users'
 import GoogleCallback from './pages/auth/GoogleCallback'
+import UserProfile from './components/UserProfile'
 
 export const router = createBrowserRouter(
   [
@@ -41,6 +42,10 @@ export const router = createBrowserRouter(
           element: <Users />,
         },
         {
+          path: 'users/:userId',
+          element: <UserProfile />,
+        },
+        {
           path: 'profile',
           element: (
             <ProtectedRoute>
@@ -59,6 +64,7 @@ export const router = createBrowserRouter(
     future: {
       v7_normalizeFormMethod: true,
       v7_relativeSplatPath: true,
+      v7_startTransition: true
     },
   }
 ) 

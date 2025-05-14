@@ -63,14 +63,23 @@ async def create_episode_router(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db)
 ) -> EpisodeList:
-    episode_data = EpisodeCreate(
-        movie_id=movie_id,
-        title=title,
-        episode_number=episode_number,
-        video=video,
-        cost=cost
-    )
-    return await create_new_episode(episode_data, session, current_user)
+    """Создать новый эпизод"""
+    try:
+        episode_data = EpisodeCreate(
+            movie_id=movie_id,
+            title=title,
+            episode_number=episode_number,
+            video=video,
+            cost=cost
+        )
+        return await create_new_episode(episode_data, session, current_user)
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(
+            status_code=500,
+            detail=f"Внутренняя ошибка сервера: {str(e)}"
+        )
 
 @episode_router.patch("/{episode_id}", response_model=EpisodeUpdateResponse)
 async def update_episode_router(

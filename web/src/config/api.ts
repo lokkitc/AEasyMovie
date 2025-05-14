@@ -175,5 +175,17 @@ export const users = {
   getUsers: async () => {
     const response = await api.get('/users/')
     return response.data
+  },
+  
+  getUserById: async (userId: number) => {
+    try {
+      const response = await api.get(`/users/${userId}`)
+      return response.data
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        throw new Error('Пользователь не найден')
+      }
+      throw new Error(error.response?.data?.detail || 'Ошибка при получении профиля пользователя')
+    }
   }
 }

@@ -31,8 +31,11 @@ class EpisodeCreate(BaseModel):
     movie_id: int
     title: str
     episode_number: int
-    video: str
+    video: UploadFile
     cost: float = 15.0
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class EpisodeUpdate(BaseModel):
     title: Optional[str] = None

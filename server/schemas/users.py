@@ -145,3 +145,13 @@ class MoneyAddResponse(BaseModel):
     message: str
     new_balance: float
 
+class PremiumPurchaseRequest(TunedModel):
+    months: int = Field(ge=1, le=12, description="Количество месяцев премиум-подписки")
+    payment_method: str = Field(description="Метод оплаты (например, 'card', 'crypto')")
+
+class PremiumPurchaseResponse(TunedModel):
+    success: bool
+    message: str
+    premium_until: Optional[datetime]
+    transaction_id: Optional[str]
+

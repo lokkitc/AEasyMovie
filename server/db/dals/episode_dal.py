@@ -12,13 +12,15 @@ class EpisodeDAL:
         movie_id: int,
         title: str,
         video_file: str,
-        episode_number: int
+        episode_number: int,
+        cost: float = 15.0
     ) -> Episode:
         new_episode = Episode(
             movie_id=movie_id,
             title=title,
             video_file=video_file,
-            episode_number=episode_number
+            episode_number=episode_number,
+            cost=cost
         )
         self.db_session.add(new_episode)
         await self.db_session.flush()
