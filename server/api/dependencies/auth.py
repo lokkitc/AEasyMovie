@@ -7,7 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 
-import core.config as settings
+from ...core.config import (
+    SECRET_KEY,
+    ALGORITHM,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    MAX_LOGIN_ATTEMPTS,
+    LOGIN_ATTEMPT_WINDOW
+)
 from schemas.users import Token
 from db.dals.user_dal import UserDAL
 from db.models.users import User, LoginAttempt
@@ -32,7 +38,7 @@ async def check_login_attempts(email: str, session: AsyncSession) -> bool:
     await session.execute(
         delete(LoginAttempt).where(
             LoginAttempt.email == email,
-            LoginAttempt.created_at < datetime.utcnow() - timedelta(minutes=settings.LOGIN_ATTEMPT_WINDOW)
+            LoginAttempt.created_at < datetime.utcnow() - timedelta(minutes=LOGIN_ATTEMPT_WINDOW)
         )
     )
     
@@ -40,12 +46,12 @@ async def check_login_attempts(email: str, session: AsyncSession) -> bool:
     result = await session.execute(
         select(LoginAttempt).where(
             LoginAttempt.email == email,
-            LoginAttempt.created_at > datetime.utcnow() - timedelta(minutes=settings.LOGIN_ATTEMPT_WINDOW)
+            LoginAttempt.created_at > datetime.utcnow() - timedelta(minutes=LOGIN_ATTEMPT_WINDOW)
         )
     )
     attempts = result.scalars().all()
     
-    return len(attempts) < settings.MAX_LOGIN_ATTEMPTS
+    return len(attempts) < MAX_LOGIN_ATTEMPTS
 
 async def record_login_attempt(email: str, success: bool, session: AsyncSession):
     """Записывает попытку входа"""
@@ -96,7 +102,7 @@ async def login_for_access_token(
             detail="Incorrect username or password",
         )
     
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email},
         expires_delta=access_token_expires,
@@ -116,8 +122,8 @@ async def get_current_user_from_token(
     try:
         payload = jwt.decode(
             token, 
-            settings.SECRET_KEY, 
-            algorithms=[settings.ALGORITHM]
+            SECRET_KEY, 
+            algorithms=[ALGORITHM]
         )
         email: str = payload.get("sub")
         
