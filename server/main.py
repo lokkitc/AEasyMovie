@@ -32,9 +32,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],  # Разрешить все источники для теста
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=3600,
@@ -51,11 +51,12 @@ app.mount("/media", StaticFiles(directory="server/media", html=True), name="medi
 app.include_router(main_router)
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(
         "main:app",
-        host="127.0.0.1",
-        port=8000,
+        host="0.0.0.0",  # Слушать на всех интерфейсах
+        port=port,
         reload=True
     )
-    print("\nServer is running on http://127.0.0.1:8000\n")
+    print(f"\nServer is running on http://0.0.0.0:{port}\n")
     print("Press Ctrl+C to stop the server\n")
